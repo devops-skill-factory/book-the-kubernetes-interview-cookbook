@@ -1,6 +1,6 @@
 # book-the-kubernetes-interview-cookbook
 
-The Kubernetes Interview Cookbook: The Definitive Guide to Cloud-Native Mastery
+The Kubernetes Interview Cookbook: The Definitive Guide to Cloud-Native Mastery (1st edition).
 
 ![](./img/The_Kubernetes_Cookbook_Cover.png)
 
