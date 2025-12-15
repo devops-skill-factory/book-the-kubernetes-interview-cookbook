@@ -1,0 +1,58 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  # Define the base box and resource limits
+  config.vm.box = "ubuntu/focal64"
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  # Common settings for all nodes
+  num_nodes = 3
+  (1..num_nodes).each do |i|
+    hostname = "etcd-0#{i}"
+    ip = "192.168.56.1#{i}"
+
+    config.vm.define hostname do |node|
+      node.vm.hostname = hostname
+      node.vm.network "private_network", ip: ip
+
+      # Configure resources for each VM (Optional, but recommended for etcd)
+      node.vm.provider "virtualbox" do |vb|
+        vb.memory = "1024"
+        vb.cpus = "1"
+        vb.name = hostname # Uncomment if you want the VM name to match the hostname
+      end
+
+      # Shell Provisioner for Firewall Configuration
+      node.vm.provision "shell", inline: <<-SHELL
+        echo "Installing Uncomplicated Firewall (UFW) on #{hostname}..."
+        sudo apt update
+        sudo apt install -y ufw
+
+        # Enable UFW if not already enabled
+        if ! sudo ufw status | grep -q "Status: active"; then
+            echo "Enabling UFW..."
+            sudo ufw --force enable
+        fi
+
+        # Allow SSH (port 22) - essential for remote access
+        echo "Allowing SSH (Port 22)..."
+        sudo ufw allow 22/tcp
+
+        # --- etcd Communication Ports ---
+
+        # Port 2379: Client requests (API server to etcd)
+        echo "Allowing etcd client port (2379)..."
+        sudo ufw allow 2379/tcp
+
+        # Port 2380: Peer-to-peer communication (etcd cluster members)
+        echo "Allowing etcd peer port (2380)..."
+        sudo ufw allow 2380/tcp
+
+        # Display final UFW status
+        echo "UFW status on #{hostname}:"
+        sudo ufw status
+      SHELL
+    end
+  end
+end
