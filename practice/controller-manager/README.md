@@ -64,7 +64,7 @@ minikube start
 ```bash
 minikube ssh
 ```
-4.  **Pause the Controller Manager:** * On Minikube/Kind, the controller manager runs as a static pod in the `kube-system` namespace.
+4.  **Pause the Controller Manager:** On Minikube, the controller manager runs as a static pod in the `kube-system` namespace.
     * Find the manifest file (usually at `/etc/kubernetes/manifests/kube-controller-manager.yaml` on the node) and move it out of that folder temporarily. This will stop the pod.
     ```bash
     cd /etc/kubernetes/manifests
